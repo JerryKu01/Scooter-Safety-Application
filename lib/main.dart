@@ -7,6 +7,21 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static final Color primaryColor = Color(0xFF254D32);
+  static final Color secondaryColor = Color(0xFF69B578);
+  static final Color surfaceColor = Color(0xFFF2F4E1);
+  static final Color accentColor = Color(0xFF181D27);
+  static final ColorScheme scheme = ColorScheme(
+      brightness: Brightness.light,
+      primary: primaryColor,
+      onPrimary: surfaceColor,
+      secondary: secondaryColor,
+      onSecondary: accentColor,
+      error: Colors.red,
+      onError: Colors.white,
+      surface: surfaceColor,
+      onSurface: accentColor
+  );
 
   // This widget is the root of your application.
   @override
