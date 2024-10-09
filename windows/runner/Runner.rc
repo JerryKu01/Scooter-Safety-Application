@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "scooter_safety_application" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "scooter_safety_application" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.codingmind. All rights reserved." "\0"
             VALUE "OriginalFilename", "scooter_safety_application.exe" "\0"
             VALUE "ProductName", "scooter_safety_application" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

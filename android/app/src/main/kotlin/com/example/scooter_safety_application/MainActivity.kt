@@ -1,4 +1,4 @@
-package com.example.scooter_safety_application
+package com.codingmind.tracktrail
 
 import io.flutter.embedding.android.FlutterActivity
 

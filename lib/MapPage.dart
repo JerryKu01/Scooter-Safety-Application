@@ -6,58 +6,71 @@ import "package:scooter_safety_application/components/GpsDataService.dart";
 import "package:scooter_safety_application/main.dart";
 
 class MapPage extends StatefulWidget {
-  const MapPage({super.key});
-
   @override
-  State<MapPage> createState() => _MapPageState();
+  _MapPageState createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
   final GpsDataService _gpsDataService = GpsDataService();
   final MapController _mapController = MapController();
+  bool _mapInitialized = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("GPS Tracker"),
-        backgroundColor: MyApp.primaryColor,
-      ),
+      appBar: AppBar(title: const Text('GPS Tracker')),
       body: StreamBuilder<GpsData>(
-        stream: _gpsDataService.getGpsData(),
+        stream: _gpsDataService.getCurrentLocationStream(),
         builder: (context, snapshot) {
-          if(snapshot.hasData){
+          if (snapshot.hasData) {
             final gpsData = snapshot.data!;
-            _mapController.move(
-            LatLng(gpsData.latitude, gpsData.longitude),
-            _mapController.camera.zoom
-            );
+
+            // Update the map's center when new data comes in
+            if (_mapInitialized) {
+              _mapController.move(
+                LatLng(gpsData.latitude, gpsData.longitude),
+                _mapController.camera.zoom,
+              );
+            }
 
             return FlutterMap(
-                options: MapOptions(
-                  initialCenter: LatLng(gpsData.latitude, gpsData.longitude),
-                  initialZoom: _mapController.camera.zoom
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: LatLng(gpsData.latitude, gpsData.longitude),
+                initialZoom: 15.0,
+                onMapReady: () {
+                  setState(() {
+                    _mapInitialized = true;
+                  });
+                },
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  subdomains: const ['a', 'b', 'c'],
                 ),
-                children: [
-                  TileLayer(
-                    urlTemplate:  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      subdomains: ['a', 'b', 'c'],
-                  ),
-                  MarkerLayer(
-                      markers: [
-                        Marker(point: LatLng(gpsData.latitude, gpsData.longitude),
-                            width: 80,
-                            height: 80,
-                            child: Icon(Icons.location_pin,)
-                        )
-                      ])
-                ]);
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      point: LatLng(gpsData.latitude, gpsData.longitude),
+                      width: 80.0,
+                      height: 80.0,
+                      child: const Icon(
+                        Icons.location_pin,
+                        color: Colors.red,
+                        size: 50.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
-          else if(snapshot.hasError){
-            return Center(child: Text("There is error in the data!!"),);
-          }
-          return Center(child: CircularProgressIndicator(),);
+          return const Center(child: CircularProgressIndicator());
         },
-      )
+      ),
     );
   }
 }
