@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:scooter_safety_application/firebase/authentication.dart';
 
 class GpsData {
   final double latitude;
@@ -21,11 +22,35 @@ class GpsDataService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // For Option A: Get the current location
-  Stream<GpsData> getCurrentLocationStream() {
-    return _db.collection('gps_data').doc('current_location').snapshots().map(
-          (doc) => GpsData.fromFirestore(doc),
-    );
+  Future<List<Map<String, dynamic>>> getUserPath() async {
+    try {
+      DocumentSnapshot tripSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(AuthenticationHelper().uid)
+          .collection('gps_data')
+          .doc('trip_test')
+          .get();
+
+      if (tripSnapshot.exists) {
+        // Get the path as a list of maps
+        List<dynamic> pathData = tripSnapshot['path'];
+
+        // Convert to list of maps with latitude, longitude, and timestamp
+        return pathData.map((point) => {
+          'latitude': point['latitude'],
+          'longitude': point['longitude'],
+          'timestamp': point['timestamp'],
+        }).toList();
+      } else {
+        print("No trip data found");
+        return [];
+      }
+    } catch (e) {
+      print("Error getting path data: $e");
+      return [];
+    }
   }
+
 
   // For Option B: Get a stream of GPS data points
   Stream<List<GpsData>> getGpsDataStream() {

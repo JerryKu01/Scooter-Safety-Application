@@ -69,7 +69,6 @@ class AuthenticationHelper {
       'username': username,
       'email': email,
       'deviceID': '',
-      'airQuality': {},
     };
     await userDoc.set(userData);
   }
