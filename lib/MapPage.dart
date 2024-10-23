@@ -1,12 +1,10 @@
 import "package:flutter/material.dart";
 import "package:flutter_map/flutter_map.dart";
 import "package:latlong2/latlong.dart";
-import "package:scooter_safety_application/components/GpsDataService.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:scooter_safety_application/firebase/authentication.dart";
 
 class MapPage extends StatefulWidget {
-
   MapPage();
 
   @override
@@ -19,6 +17,7 @@ class _MapPageState extends State<MapPage> {
 
   // Path list for the user's journey
   List<LatLng> _path = [];
+  double _currentSpeed = 0.0; // To store the current speed
 
   @override
   void initState() {
@@ -50,6 +49,7 @@ class _MapPageState extends State<MapPage> {
         // Convert Firestore data to LatLng points
         setState(() {
           _path = pathData.map((point) => LatLng(point['latitude'], point['longitude'])).toList();
+          _currentSpeed = pathData.last['speed']; // Get the latest speed value
         });
 
         // Move the map to the first point in the path after updating the state
@@ -68,50 +68,63 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('GPS Tracker')),
-      body: _path.isEmpty
-          ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching data
-          : FlutterMap(
-        mapController: _mapController,
-        options: MapOptions(
-          initialCenter: _path.isNotEmpty ? _path.first : LatLng(0.0, 0.0), // Set the map center to the first path point
-          initialZoom: 15.0,
-          onMapReady: () {
-            setState(() {
-              _mapInitialized = true;
-            });
-          },
-        ),
+      body: Column(
         children: [
-          TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: const ['a', 'b', 'c'],
+          // Display the current speed
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Current Speed: ${(_currentSpeed * 1.15078).toStringAsFixed(2)} miles per hour',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
-          MarkerLayer(
-            markers: _path.isNotEmpty
-                ? [
-              Marker(
-                point: _path.last, // Show marker at the most recent location
-                width: 80.0,
-                height: 80.0,
-                child: const Icon(
-                  Icons.location_pin,
-                  color: Colors.red,
-                  size: 50.0,
+          Expanded(
+            child: _path.isEmpty
+                ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching data
+                : FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: _path.isNotEmpty ? _path.first : LatLng(0.0, 0.0), // Set the map center to the first path point
+                initialZoom: 15.0,
+                onMapReady: () {
+                  setState(() {
+                    _mapInitialized = true;
+                  });
+                },
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  subdomains: const ['a', 'b', 'c'],
                 ),
-              ),
-            ]
-                : [],
-          ),
-          // Polyline layer for the path
-          PolylineLayer(
-            polylines: [
-              Polyline(
-                points: _path,
-                strokeWidth: 4.0,
-                color: Colors.blue, // Path color
-              ),
-            ],
+                MarkerLayer(
+                  markers: _path.isNotEmpty
+                      ? [
+                    Marker(
+                      point: _path.last, // Show marker at the most recent location
+                      width: 80.0,
+                      height: 80.0,
+                      child: const Icon(
+                        Icons.location_pin,
+                        color: Colors.red,
+                        size: 50.0,
+                      ),
+                    ),
+                  ]
+                      : [],
+                ),
+                // Polyline layer for the path
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: _path,
+                      strokeWidth: 4.0,
+                      color: Colors.blue, // Path color
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
