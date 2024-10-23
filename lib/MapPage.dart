@@ -1,8 +1,8 @@
-import "package:flutter/material.dart";
-import "package:flutter_map/flutter_map.dart";
-import "package:latlong2/latlong.dart";
-import "package:cloud_firestore/cloud_firestore.dart";
-import "package:scooter_safety_application/firebase/authentication.dart";
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:scooter_safety_application/firebase/authentication.dart';
 
 class MapPage extends StatefulWidget {
   MapPage();
@@ -48,7 +48,9 @@ class _MapPageState extends State<MapPage> {
 
         // Convert Firestore data to LatLng points
         setState(() {
-          _path = pathData.map((point) => LatLng(point['latitude'], point['longitude'])).toList();
+          _path = pathData
+              .map((point) => LatLng(point['latitude'], point['longitude']))
+              .toList();
           _currentSpeed = pathData.last['speed']; // Get the latest speed value
         });
 
@@ -56,7 +58,6 @@ class _MapPageState extends State<MapPage> {
         if (_path.isNotEmpty && _mapInitialized) {
           _mapController.move(_path.first, 15.0); // Center the map on the first point with a zoom level of 15.0
         }
-
       } else {
         print("No trip data found for this userId and tripId.");
       }
@@ -65,26 +66,69 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  // Refresh the data
+  void _refreshData() {
+    setState(() {
+      _path.clear();
+      _currentSpeed = 0.0;
+      _mapInitialized = false;
+    });
+    _fetchPathData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      appBar: AppBar(
+        title: Text('Current Trip'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: _refreshData,
+          ),
+        ],
+      ),
+      body: _path.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : Column(
         children: [
-          // Display the current speed
+          // Display the current speed in a card
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Current Speed: ${(_currentSpeed * 1.15078).toStringAsFixed(2)} miles per hour',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            padding: const EdgeInsets.all(12.0),
+            child: Card(
+              elevation: 4.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: ListTile(
+                leading: Icon(
+                  Icons.speed,
+                  color: Theme.of(context).primaryColor,
+                  size: 40.0,
+                ),
+                title: Text(
+                  'Current Speed',
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  '${(_currentSpeed * 1.15078).toStringAsFixed(2)} mph',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
             ),
           ),
+          // Expanded map area
           Expanded(
-            child: _path.isEmpty
-                ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching data
-                : FlutterMap(
+            child: FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                initialCenter: _path.isNotEmpty ? _path.first : LatLng(0.0, 0.0), // Set the map center to the first path point
+                initialCenter: _path.isNotEmpty ? _path.first : LatLng(0.0, 0.0),
                 initialZoom: 15.0,
                 onMapReady: () {
                   setState(() {
@@ -97,14 +141,24 @@ class _MapPageState extends State<MapPage> {
                   urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                   subdomains: const ['a', 'b', 'c'],
                 ),
+                // Polyline layer for the path
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: _path,
+                      strokeWidth: 4.0,
+                      color: Theme.of(context).primaryColor, // Path color
+                    ),
+                  ],
+                ),
                 MarkerLayer(
                   markers: _path.isNotEmpty
                       ? [
                     Marker(
-                      point: _path.last, // Show marker at the most recent location
+                      point: _path.last,
                       width: 80.0,
                       height: 80.0,
-                      child: const Icon(
+                      child: Icon(
                         Icons.location_pin,
                         color: Colors.red,
                         size: 50.0,
@@ -112,16 +166,6 @@ class _MapPageState extends State<MapPage> {
                     ),
                   ]
                       : [],
-                ),
-                // Polyline layer for the path
-                PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      points: _path,
-                      strokeWidth: 4.0,
-                      color: Colors.blue, // Path color
-                    ),
-                  ],
                 ),
               ],
             ),

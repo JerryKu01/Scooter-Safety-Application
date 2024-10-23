@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:scooter_safety_application/HistoryPage.dart';
 import 'package:scooter_safety_application/MapPage.dart';
 import 'package:scooter_safety_application/userPage.dart';
 
@@ -15,15 +16,12 @@ class _DashboardState extends State<Dashboard> {
   int selectedPageIndex = 0;
   final List<Widget> pages = [
     MapPage(),
+    TripHistoryPage(),
     UserPage(),
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("TrackTrail"),
-        elevation: 2,
-      ),
       body: Center(child: pages[selectedPageIndex],),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedPageIndex,
@@ -36,6 +34,10 @@ class _DashboardState extends State<Dashboard> {
         destinations: [
           NavigationDestination(
               icon: Icon(selectedPageIndex == 0 ? Icons.home : Icons.home_outlined),
+              label: "Home"
+          ),
+          NavigationDestination(
+              icon: Icon(selectedPageIndex == 0 ? Icons.history : Icons.history_outlined),
               label: "Home"
           ),
           NavigationDestination(

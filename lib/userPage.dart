@@ -5,65 +5,68 @@ import 'package:scooter_safety_application/firebase/authentication.dart';
 class UserPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildCard(
-            context,
-            icon: Icons.info,
-            text: 'User Information',
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => DetailedUserPage(userId: AuthenticationHelper().uid)),
-              // );
-            },
-          ),
-          const Divider(),
-          _buildCard(
-            context,
-            icon: Icons.settings,
-            text: 'Device Settings',
-            onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => DeviceSettings()),
-              // );
-            },
-          ),
-          const Divider(),
-          _buildCard(
-            context,
-            icon: Icons.logout,
-            text: 'Sign Out',
-            onTap: () {
-              _showConfirmationDialog(
-                context,
-                title: 'Sign Out',
-                content: 'Are you sure you want to sign out?',
-                onConfirm: () async {
-                  await AuthenticationHelper().signOut();
-                  // Navigator.pushAndRemoveUntil(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => LoginPage()), // Replace with your login screen
-                  //       (route) => false,
-                  // );
-                  },
-              );
-            },
-          ),
-          const Divider(),
-          _buildCard(
-            context,
-            icon: Icons.delete,
-            text: 'Delete Account',
-            onTap: () {
-              _showDeleteAccountDialog(context);
-            },
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBar(title: Text("Me"),),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCard(
+              context,
+              icon: Icons.info,
+              text: 'User Information',
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => DetailedUserPage(userId: AuthenticationHelper().uid)),
+                // );
+              },
+            ),
+            const Divider(),
+            _buildCard(
+              context,
+              icon: Icons.settings,
+              text: 'Device Settings',
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => DeviceSettings()),
+                // );
+              },
+            ),
+            const Divider(),
+            _buildCard(
+              context,
+              icon: Icons.logout,
+              text: 'Sign Out',
+              onTap: () {
+                _showConfirmationDialog(
+                  context,
+                  title: 'Sign Out',
+                  content: 'Are you sure you want to sign out?',
+                  onConfirm: () async {
+                    await AuthenticationHelper().signOut();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginPage()), // Replace with your login screen
+                          (route) => false,
+                    );
+                    },
+                );
+              },
+            ),
+            const Divider(),
+            _buildCard(
+              context,
+              icon: Icons.delete,
+              text: 'Delete Account',
+              onTap: () {
+                _showDeleteAccountDialog(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
