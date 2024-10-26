@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:scooter_safety_application/authentication/deviceSettingsPage.dart';
 import 'package:scooter_safety_application/authentication/loginPage.dart';
+import 'package:scooter_safety_application/detailedUserPage.dart';
 import 'package:scooter_safety_application/firebase/authentication.dart';
 
 class UserPage extends StatelessWidget {
@@ -17,10 +19,10 @@ class UserPage extends StatelessWidget {
               icon: Icons.info,
               text: 'User Information',
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => DetailedUserPage(userId: AuthenticationHelper().uid)),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DetailedUserPage(userId: AuthenticationHelper().uid)),
+                );
               },
             ),
             const Divider(),
@@ -29,10 +31,10 @@ class UserPage extends StatelessWidget {
               icon: Icons.settings,
               text: 'Device Settings',
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => DeviceSettings()),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DeviceSettingsPage()),
+                );
               },
             ),
             const Divider(),
