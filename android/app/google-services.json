@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "591227665142",
+    "project_id": "tracktrail-c9b38",
+    "storage_bucket": "tracktrail-c9b38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591227665142:android:4d0786a869892124b60ad7",
+        "android_client_info": {
+          "package_name": "com.codingmind.tracktrail"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx83pPh04ih9gRva3VNQaE2U6IX1a-8eI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "2"
+}

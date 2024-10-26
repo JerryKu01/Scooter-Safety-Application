@@ -49,6 +49,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: scheme.onPrimary,
         ),
         scaffoldBackgroundColor: scheme.background,
+
         textTheme: TextTheme(
           bodyMedium: TextStyle(color: scheme.onBackground),
           bodySmall: TextStyle(color: scheme.onBackground),

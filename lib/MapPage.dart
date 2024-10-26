@@ -25,44 +25,72 @@ class _MapPageState extends State<MapPage> {
     _fetchPathData(); // Fetch the path data when the page loads
   }
 
-  // Fetch path data from Firestore (where path is stored as a list of maps)
+// Fetch path data from Firestore (where path is stored as a list of maps)
   Future<void> _fetchPathData() async {
     try {
       print("Attempting to fetch data...");
 
-      // Reference to the user's trip document
-      DocumentSnapshot tripSnapshot = await FirebaseFirestore.instance
+      // Reference to the user's root document to check the 'is_in_trip' trigger
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(AuthenticationHelper().uid)
-          .collection('gps_data')
-          .doc('trip_test')
           .get();
 
-      print("Fetched trip data: ${tripSnapshot.data()}");
+      if (userSnapshot.exists && userSnapshot['is_in_trip'] == true) {
+        // If 'is_in_trip' is true, fetch the most recent trip
+        QuerySnapshot tripQuerySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(AuthenticationHelper().uid)
+            .collection('gps_data')
+            .orderBy("start_time", descending: true)
+            .limit(1)
+            .get();
 
-      if (tripSnapshot.exists) {
-        List<dynamic> pathData = tripSnapshot['path'];
+        if (tripQuerySnapshot.docs.isNotEmpty) {
+          DocumentSnapshot tripSnapshot = tripQuerySnapshot.docs.first;
 
-        // Debug: print the path data fetched
-        print("Path data: $pathData");
+          print("Fetched trip data: ${tripSnapshot.data()}");
 
-        // Convert Firestore data to LatLng points
-        setState(() {
-          _path = pathData
-              .map((point) => LatLng(point['latitude'], point['longitude']))
-              .toList();
-          _currentSpeed = pathData.last['speed']; // Get the latest speed value
-        });
+          List<dynamic> pathData = tripSnapshot['path'];
 
-        // Move the map to the first point in the path after updating the state
-        if (_path.isNotEmpty && _mapInitialized) {
-          _mapController.move(_path.first, 15.0); // Center the map on the first point with a zoom level of 15.0
+          // Debug: print the path data fetched
+          print("Path data: $pathData");
+
+          // Convert Firestore data to LatLng points
+          setState(() {
+            _path = pathData
+                .map((point) => LatLng(point['latitude'], point['longitude']))
+                .toList();
+            _currentSpeed = pathData.last['speed']; // Get the latest speed value
+          });
+
+          // Move the map to the first point in the path after updating the state
+          if (_path.isNotEmpty && _mapInitialized) {
+            _mapController.move(
+                _path.first, 15.0); // Center the map on the first point with a zoom level of 15.0
+          }
+        } else {
+          // No trips found for the user
+          setState(() {
+            _path = [];
+            _currentSpeed = 0.0;
+          });
+          print("No trip data found for this userId and tripId.");
         }
       } else {
-        print("No trip data found for this userId and tripId.");
+        // 'is_in_trip' is false or user document doesn't exist
+        setState(() {
+          _path = [];
+          _currentSpeed = 0.0;
+        });
+        print("No active trips found.");
       }
     } catch (e) {
       print("Error fetching path data: $e");
+      setState(() {
+        _path = [];
+        _currentSpeed = 0.0;
+      });
     }
   }
 
@@ -89,7 +117,12 @@ class _MapPageState extends State<MapPage> {
         ],
       ),
       body: _path.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+        child: Text(
+          'No active trips found',
+          style: TextStyle(fontSize: 18.0),
+        ),
+      )
           : Column(
         children: [
           // Display the current speed in a card
@@ -172,6 +205,7 @@ class _MapPageState extends State<MapPage> {
           ),
         ],
       ),
+
     );
   }
 }
