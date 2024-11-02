@@ -38,7 +38,7 @@ class _DashboardState extends State<Dashboard> {
           ),
           NavigationDestination(
               icon: Icon(selectedPageIndex == 0 ? Icons.history : Icons.history_outlined),
-              label: "Home"
+              label: "Previous Trips"
           ),
           NavigationDestination(
               icon: Icon(selectedPageIndex == 2 ? Icons.grid_view_rounded : Icons.grid_view_outlined),

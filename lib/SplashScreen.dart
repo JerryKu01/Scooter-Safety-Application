@@ -53,6 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Color(0xFF7cb995),
         body: Stack(
           alignment: Alignment.center,
           children: [
@@ -64,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 children: [
                   const Spacer(),
                   Text(
-                    'Lumigen',
+                    'TrackTrail',
                     style: GoogleFonts.raleway(
                         fontWeight: FontWeight.bold,
                         fontSize: 40,
@@ -76,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     width: 300,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('assets/transparent_logo.png'),
+                        image: AssetImage('assets/logo.png'),
                         fit: BoxFit.cover,
                       ),
                     ),

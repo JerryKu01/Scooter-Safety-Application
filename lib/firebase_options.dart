@@ -54,7 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:591227665142:android:4d0786a869892124b60ad7',
     messagingSenderId: '591227665142',
     projectId: 'tracktrail-c9b38',
-    storageBucket: 'tracktrail-c9b38.appspot.com',
+    storageBucket: 'tracktrail-c9b38.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
     appId: '1:591227665142:ios:3a3698a7fbfe3d7db60ad7',
     messagingSenderId: '591227665142',
     projectId: 'tracktrail-c9b38',
-    storageBucket: 'tracktrail-c9b38.appspot.com',
+    storageBucket: 'tracktrail-c9b38.firebasestorage.app',
     iosBundleId: 'com.codingmind.tracktrail',
   );
 

@@ -25,8 +25,9 @@ class _MapPageState extends State<MapPage> {
     _fetchPathData(); // Fetch the path data when the page loads
   }
 
-// Fetch path data from Firestore (where path is stored as a list of maps)
-  Future<void> _fetchPathData() async {
+  // Fetch path data from Firestore (where path is stored as a list of maps)
+  Future<bool> _fetchPathData() async {
+    bool hasActiveTrip = false;
     try {
       print("Attempting to fetch data...");
 
@@ -69,6 +70,7 @@ class _MapPageState extends State<MapPage> {
             _mapController.move(
                 _path.first, 15.0); // Center the map on the first point with a zoom level of 15.0
           }
+          hasActiveTrip = true;
         } else {
           // No trips found for the user
           setState(() {
@@ -92,16 +94,25 @@ class _MapPageState extends State<MapPage> {
         _currentSpeed = 0.0;
       });
     }
+    return hasActiveTrip;
   }
 
   // Refresh the data
-  void _refreshData() {
+  void _refreshData() async {
     setState(() {
       _path.clear();
       _currentSpeed = 0.0;
       _mapInitialized = false;
     });
-    _fetchPathData();
+    bool hasActiveTrip = await _fetchPathData();
+    if (!hasActiveTrip) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No active trips found'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   @override
@@ -161,7 +172,8 @@ class _MapPageState extends State<MapPage> {
             child: FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                initialCenter: _path.isNotEmpty ? _path.first : LatLng(0.0, 0.0),
+                initialCenter:
+                _path.isNotEmpty ? _path.first : LatLng(0.0, 0.0),
                 initialZoom: 15.0,
                 onMapReady: () {
                   setState(() {
@@ -171,7 +183,8 @@ class _MapPageState extends State<MapPage> {
               ),
               children: [
                 TileLayer(
-                  urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  urlTemplate:
+                  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                   subdomains: const ['a', 'b', 'c'],
                 ),
                 // Polyline layer for the path
@@ -205,7 +218,6 @@ class _MapPageState extends State<MapPage> {
           ),
         ],
       ),
-
     );
   }
 }
